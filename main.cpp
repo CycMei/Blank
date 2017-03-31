@@ -5,10 +5,12 @@
 
 int main() {
 
-	creatMap cmp(10, 10);
-	cmp.setRadomBalk();
+	// x,y,radomNum  all is unsigned int
+	creatMap cmp(20, 30,30);
+	cmp.showMap();
+	cmp.Go();
 
-	//system("cls");
+
 
 	return 0;
 }
