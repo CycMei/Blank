@@ -40,6 +40,19 @@ public:
 
 bool operator==(const RNode&,const RNode&);
 
+class creatMap;
+class RunPoint {
+public:
+	int NodeIndex;
+	int preNodeinde;
+	double Tbeg;
+	double Tend;
+	double disTime;
+	bool isGo;
+public:
+	RunPoint(int);
+	void RPGo(creatMap*);
+};
 
 class creatMap {
 private:
@@ -51,19 +64,19 @@ private:
 	const unsigned randomTotalNum;
 	const bool subSetRadomBalk(const std::vector<unsigned>&,const unsigned&);
 	const bool subSetRadomRalkNode(const std::vector<RNode>&, const RNode&);
-	RNode &getNodeNodeByIndex(const unsigned&);
 	const std::vector<RNode> setRadomBalk();
-	std::vector<std::vector<unsigned>> findPath();
-	std::vector<unsigned> GoType(const unsigned);
-	void subGoType(unsigned, unsigned &);
+
+	std::vector<std::vector<unsigned>> findPath(const unsigned, const unsigned);
 public:
 	creatMap(const unsigned,const unsigned,const unsigned);
+	int GoType(const unsigned, const int);
+	RNode &getNodeNodeByIndex(const unsigned&);
+
+
 	void showMap();
 	void Go();
 };
 
-class Run {
 
-};
 
 #endif // !ONE_H

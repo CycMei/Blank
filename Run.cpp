@@ -8,17 +8,14 @@ void printClean() {
 	//printf("\033[2J");
 }
 
+void MMSleep(double times) {
+	Sleep(times);
+}
+
 //unsigned getHashKeyByXY(const unsigned &x, const unsigned &y) {
 //	return (x + x * 10)*(y + y * 10);
 //}
 
-enum StrEnum {
-	A = 'A',
-	B = 'B',
-	C = 'C',
-	D = 'D',
-	E = 'E'
-};
 
 
 RNode::RNode(unsigned index_, unsigned x, unsigned y, char c, bool bl) :index(index_),RX(x), RY(y), str(c), isBalk(bl) {}
@@ -61,8 +58,8 @@ bool RNode::getBoolArrByIndex(const unsigned &index) const {
 }
 
 void RNode::printColorByStr(const char c,bool isBLank) {
-	this->setStrAndBalk(c, isBalk);
-	this->printNodeStr();
+	this->setStrAndBalk(c, isBLank);
+	//this->printNodeStr();
 	//if (c == 'A') {
 	//	printf(RED+c);
 	//}
@@ -217,14 +214,16 @@ void creatMap::showMap() {
 
 }
 
-std::vector<std::vector<unsigned>> creatMap::findPath() {
-	const unsigned _x = 1, _y = 1;
+std::vector<std::vector<unsigned>> creatMap::findPath(const unsigned _index, const unsigned nodeIndex) {
+	RNode rnn=this->getNodeNodeByIndex(nodeIndex);
+
+
+	const unsigned _x = rnn.getNodeX(), _y = rnn.getNodeY();
 	std::deque<RNode> deq;
-	const unsigned _index = 0;
 	_map[_x][_y].setBoolArrByIndex(_index, true);
 	deq.push_back(_map[_x][_y]);
 
-	std::vector<std::vector<unsigned>> res = { { startIndex } };
+	std::vector<std::vector<unsigned>> res = { { deq.front().getNodeIndex() } };
 	while (!deq.empty()) {
 		const RNode &rn = deq.front();
 		const unsigned x = rn.getNodeX();
@@ -261,6 +260,23 @@ std::vector<std::vector<unsigned>> creatMap::findPath() {
 				}
 			}
 		}
+
+		if (!_map[x-1][y].getNodeBalk() && !_map[x-1][y].getBoolArrByIndex(_index)) {
+			deq.push_back(_map[x-1][y]);
+			_map[x-1][y].setBoolArrByIndex(_index, true);
+			for (unsigned o = 0; o != res.size(); ++o) {
+				if (res[o][res[o].size() - 1] == rn.getNodeIndex()) {
+					std::vector<unsigned> iv;
+					for (unsigned a = 0; a != res[o].size(); ++a) {
+						iv.push_back(res[o][a]);
+					}
+					iv.push_back(_map[x-1][y].getNodeIndex());
+					res.push_back({ iv });
+					break;
+				}
+			}
+		}
+
 		deq.pop_front();
 	}
 	for (unsigned i = 0; i != _map.size(); ++i) {
@@ -272,19 +288,19 @@ std::vector<std::vector<unsigned>> creatMap::findPath() {
 }
 
 
-std::vector<unsigned> creatMap::GoType(const unsigned type) {
-	//if (type == 0) {
-	//	_map[1][1].setStrAndBalk('A', true);
-	//}
-	//if (type == 1) {
-	//	_map[1][1].setStrAndBalk('B', true);
-	//}
-	showMap();
-	std::vector<std::vector<unsigned>> res=findPath();
-	if (res.size() <= 1) {
+int preAinde = 0;
+int prerBinde = 0;
+int preCinde = 0;
+int preDinde = 0;
+int preEinde = 0;
+
+int creatMap::GoType(const unsigned type,const int nodeIndex) {
+	const std::vector<std::vector<unsigned>> res=findPath(type, nodeIndex);
+	if (res.size() == 0) {
 		std::cout << "can not find path.. 1111111";
-		//return;
+		return -1;
 	}
+
 
 	int ai = -1;
 	
@@ -299,70 +315,265 @@ std::vector<unsigned> creatMap::GoType(const unsigned type) {
 
 	if (ai <0 ) {
 		std::cout << "can not find path..222222222222 ";
-		//return;
+		return -10;
 	}
 
-	return res[ai];
+	char c = ' ';
+	if (type == 0) {
+		c = 'A';
+	}
+	if (type == 1) {
+		c = 'B';
+	}
+	if (type == 2) {
+		c = 'C';
+	}
+	if (type == 3) {
+		c = 'D';
+	}
+	if (type == 4) {
+		c = 'E';
+	}
 
-	//for (unsigned a = 0; a != res[ai].size(); ++a) {
-	//	const unsigned index = res[ai][a];
-	//	//this->getNodeNodeByIndex(index).printColorByStr('A',true);
-	//	//this->showMap();
-	//	//Sleep(2.5 * 1000);
-	//	//this->getNodeNodeByIndex(index).setStrAndBalk(' ',false);
-	//}
+	if (res[ai][0] == endIndex) {
+		return -2;
+	}
+
+	const unsigned index = res[ai][1];
+	this->getNodeNodeByIndex(index).printColorByStr(c, true);
+	if (type == 0) {
+		preAinde = index;
+	}
+	if (type == 1) {
+		prerBinde = index;
+	}
+	if (type == 2) {
+		preCinde = index;
+	}
+	if (type == 3) {
+		preDinde = index;
+	}
+	if (type == 4) {
+		preEinde = index;
+	}
+	return index;
 }
 
-void creatMap::subGoType(unsigned index,unsigned &resultIndex) {
 
-	std::vector<unsigned> res=this->GoType(0);
-	unsigned CCindex = res[index];
-	resultIndex = CCindex;
-	this->getNodeNodeByIndex(CCindex).printColorByStr('A', true);
+
+void creatMap::Go() {
+
+	_map[1][1].printColorByStr('A', true);
 	this->showMap();
-}
 
-void creatMap::Go() {	
+	//A
+	int AIndex = startIndex;
+	preAinde = AIndex;
+	double Abeg = clock();
+	double Aend = clock();
+	double disA = 0.0;
+	bool AisGo = false;
 
-	std::clock_t star_tiem = clock();
-	std::clock_t end_time = 0;
-	double dis_time = 0.0;
+	//B
+	int BIndex = startIndex;
+	prerBinde = startIndex;
+	double Bbeg = clock();
+	double Bend = clock();
+	double disB = 0.0;
+	bool BisGo = false;
 
+	//C
+	int Cindex = startIndex;
+	preCinde = startIndex;
+	double Cbeg = clock();
+	double Cend = clock();
+	double disC = 0.0;
+	bool CisGo = false;
 
-	unsigned Aindex = 0;
-	unsigned AresultIndex = 0;
-	this->subGoType(Aindex, AresultIndex);
+	//D
+	int Dindex = startIndex;
+	preDinde = startIndex;
+	double Dbeg = clock();
+	double Dend = clock();
+	double disD = 0.0;
+	bool DisGo = false;
 
-	unsigned Bindex = 0;
-	unsigned BresultIndex = 0;
-
+	//E
+	int Eindex = startIndex;
+	preEinde = startIndex;
+	double Ebeg = clock();
+	double Eend = clock();
+	double disE = 0.0;
+	bool EisGo = false;
 
 	while (true) {
-		end_time = clock();
-		dis_time = end_time - star_tiem;
 
-		if (dis_time == 2 * 1000) {
-
-			this->getNodeNodeByIndex(AresultIndex).setStrAndBalk(' ', false);
-			this->subGoType(++Aindex, AresultIndex);
-
-			dis_time = 0.0;
-			star_tiem = clock();
+		Aend = clock();
+		disA = Aend - Abeg;
+		if (disA >= 3.0 * 1000) {
+			AisGo = true;
+			this->getNodeNodeByIndex(preAinde).setStrAndBalk(' ', false);
+			AIndex = this->GoType(0, AIndex);
+			this->showMap();
+			Abeg = Aend = clock();
+			disA = 0.0;
 		}
 
-		if (dis_time == 2.5 * 1000) {
-			//this->subGoType(Bindex, AresultIndex);
+
+		Bend = clock();
+		disB = Bend - Bbeg;
+		if (disB >= 2.5 * 1000) {
+			if (AisGo) {
+				if (!BisGo) {
+					_map[1][1].printColorByStr('B', true);
+				}
+				else {
+					this->getNodeNodeByIndex(prerBinde).setStrAndBalk(' ', false);
+					BIndex = this->GoType(1, BIndex);
+				}
+				BisGo = true;
+				this->showMap();
+			}
+			Bend = Bbeg = clock();
+			disB = 0.0;
 		}
+
+		Cend = clock();
+		disC = Cend - Cbeg;
+		if (disC >= 2.0 * 1000) {
+			if (AisGo&&BisGo&&BIndex>startIndex) {
+				if (!CisGo) {
+					_map[1][1].printColorByStr('C', true);
+				}
+				else {
+					this->getNodeNodeByIndex(preCinde).setStrAndBalk(' ', false);
+					Cindex = this->GoType(2, Cindex);
+				}
+				CisGo = true;
+				this->showMap();
+			}
+			Cend = Cbeg = clock();
+			disC = 0.0;
+		}
+
+		Dend = clock();
+		disD = Dend - Dbeg;
+		if (disD >= 1.5 * 1000) {
+			if (AisGo&&BisGo&&CisGo&&Cindex > startIndex) {
+				if (!DisGo) {
+					_map[1][1].printColorByStr('D', true);
+				}
+				else {
+					this->getNodeNodeByIndex(preDinde).setStrAndBalk(' ', false);
+					Dindex = this->GoType(3, Dindex);
+				}
+				DisGo = true;
+				this->showMap();
+			}
+			Dend = Dbeg = clock();
+			disD = 0.0;
+		}
+
+
+		Eend = clock();
+		disE = Eend - Ebeg;
+		if (disE >= 1.0 * 1000) {
+			if (AisGo&&BisGo&&CisGo&&DisGo&&Dindex > startIndex) {
+				if (!EisGo) {
+					_map[1][1].printColorByStr('E', true);
+				}
+				else {
+					this->getNodeNodeByIndex(preEinde).setStrAndBalk(' ', false);
+					Eindex = this->GoType(4, Eindex);
+				}
+				EisGo = true;
+				this->showMap();
+			}
+
+			Eend = Ebeg = clock();
+			disE = 0.0;
+		}
+
 
 	}
 
-	//GoType(0);
-	//for (unsigned i = 1; i != 5; ++i) {
-	//	Sleep(0.5 * 1000);
-	//	GoType(i);
-	//	break;
+	
+
+
+
+
+	//bool BisDone = false;
+
+	//while (true) {
+
+	//	MMSleep(1.0 * 1000);
+	//	if (!BisDone) {
+	//		this->getNodeNodeByIndex(prerBinde).setStrAndBalk(' ', false);
+	//		BIndex = this->GoType(1, BIndex);
+	//		if (BIndex == -2) {
+	//			BisDone = true;
+	//			this->getNodeNodeByIndex(prerBinde).setStrAndBalk('B', false);
+	//		}
+	//		else {
+	//			int tempBIndex = BIndex;
+	//			if (BIndex < 0 && AIndex>0) {
+	//				tempBIndex = tempBIndex;
+	//				this->getNodeNodeByIndex(prerBinde).setStrAndBalk('B', true);
+	//			}
+	//			if (BIndex < 0) {
+	//				std::cout << "bbb  < 0  " << std::endl;
+	//				return;
+	//			}
+	//		}
+	//		this->showMap();
+	//	}
+
+	//	this->getNodeNodeByIndex(preAinde).setStrAndBalk(' ', false);
+	//	MMSleep(0.5 * 1000);
+	//	int tempAIndex = AIndex;
+	//	AIndex = this->GoType(0, AIndex);
+	//	if (AIndex == -2) {
+	//		return;
+	//	}
+	//	if (AIndex < 0 && BIndex>0) {
+	//		AIndex = tempAIndex;
+	//		this->getNodeNodeByIndex(preAinde).setStrAndBalk('A', true);
+	//		continue;
+	//	}
+	//	this->showMap();
 	//}
 }
 
 
 
+
+
+
+RunPoint::RunPoint(int node) {
+	this->NodeIndex = node;
+	this->preNodeinde = node;
+	this->Tbeg = clock();
+	this->Tend = clock();
+	this->disTime = 0.0;
+	this->isGo = false;
+}
+
+void RunPoint::RPGo(creatMap *mthis) {
+	//Tend = clock();
+	//disTime = Tend - Tend;
+	//if (disTime >= 2.0 * 1000) {
+	//	if (AisGo) {
+	//		if (!BisGo) {
+	//			_map[1][1].printColorByStr('B', true);
+	//		}
+	//		else {
+	//			mthis->getNodeNodeByIndex(preNodeinde).setStrAndBalk(' ', false);
+	//			NodeIndex = mthis->GoType(1, NodeIndex);
+	//		}
+	//		isGo = true;
+	//		mthis->showMap();
+	//	}
+	//	Tend = Tend = clock();
+	//	disTime = 0.0;
+	//}
+}
