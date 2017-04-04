@@ -366,45 +366,78 @@ void creatMap::Go() {
 	_map[1][1].printColorByStr('A', true);
 	this->showMap();
 
+	class _RunPoint{
+	public:
+		int _Index;
+		int _PreIndex;
+		double _beg;
+		double _end;
+		double _dis;
+		bool _isGo;
+		double _typeTime;
+		_RunPoint(int nodeIndex,int type){
+			_Index=nodeIndex;
+			_PreIndex=nodeIndex;
+			_beg=clock();
+			_end=clock();
+			_dis=0.0;
+			_isGo=false;
+			_typeTime=(2.5-(type/2))*1000;
+		}
+		void initRP(){
+			_end=clock();
+			_dis=_end-_beg;
+			if(_dis>=_typeTime){
+				_end=_beg=clock();
+				_dis=0.0;
+			}
+		}
+	}
+
 	//A
-	int AIndex = startIndex;
-	preAinde = AIndex;
-	double Abeg = clock();
-	double Aend = clock();
-	double disA = 0.0;
-	bool AisGo = false;
+	_RunPoint Arp(startIndex);
+	// int AIndex = startIndex;
+	// preAinde = AIndex;
+	// double Abeg = clock();
+	// double Aend = clock();
+	// double disA = 0.0;
+	// bool AisGo = false;
 
 	//B
-	int BIndex = startIndex;
-	prerBinde = startIndex;
-	double Bbeg = clock();
-	double Bend = clock();
-	double disB = 0.0;
-	bool BisGo = false;
+	_RunPoint Brp(startIndex);
+	// int BIndex = startIndex;
+	// prerBinde = startIndex;
+	// double Bbeg = clock();
+	// double Bend = clock();
+	// double disB = 0.0;
+	// bool BisGo = false;
 
 	//C
-	int Cindex = startIndex;
-	preCinde = startIndex;
-	double Cbeg = clock();
-	double Cend = clock();
-	double disC = 0.0;
-	bool CisGo = false;
+	_RunPoint Crp(startIndex);
+	// int Cindex = startIndex;
+	// preCinde = startIndex;
+	// double Cbeg = clock();
+	// double Cend = clock();
+	// double disC = 0.0;
+	// bool CisGo = false;
 
 	//D
-	int Dindex = startIndex;
-	preDinde = startIndex;
-	double Dbeg = clock();
-	double Dend = clock();
-	double disD = 0.0;
-	bool DisGo = false;
+	_RunPoint Drp(startIndex);
+	// int Dindex = startIndex;
+	// preDinde = startIndex;
+	// double Dbeg = clock();
+	// double Dend = clock();
+	// double disD = 0.0;
+	// bool DisGo = false;
 
 	//E
-	int Eindex = startIndex;
-	preEinde = startIndex;
-	double Ebeg = clock();
-	double Eend = clock();
-	double disE = 0.0;
-	bool EisGo = false;
+	_RunPoint Epr(startIndex);
+	// int Eindex = startIndex;
+	// preEinde = startIndex;
+	// double Ebeg = clock();
+	// double Eend = clock();
+	// double disE = 0.0;
+	// bool EisGo = false;
 
 	while (true) {
 
