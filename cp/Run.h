@@ -5,7 +5,7 @@
 #include<ctime>
 #include<iostream>
 #include<cstdlib>
-#include<exception>
+#include<stdexcept>
 #include<deque>
 #include<ctime>
 
@@ -23,12 +23,12 @@ private:
 	bool boolArrIsCall[10] = { false, false, false, false, false,false,false,false,false,false };
 	bool isRealBalk = false;
 	void setNodeStr(const char c);
+	void setNOdeBalk(const bool bl);
 public:
 	RNode(unsigned, unsigned, unsigned, char, bool);
 	void printNodeStr();
 	const bool getNodeBalk() const;
 	void setStrAndBalk(const char c,bool bl);
-	void setNOdeBalk(const bool bl);
 	const unsigned int getNodeIndex() const;
 	const unsigned getNodeX() const;
 	const unsigned getNodeY() const;
@@ -41,11 +41,9 @@ public:
 
 bool operator==(const RNode&,const RNode&);
 
-class creatMap;
 class _RunPoint{
 private:
 	std::vector<unsigned> _pathVec;
-	creatMap *_cmap = NULL;
 public:
 	int _Index;
 	int _PreIndex;
@@ -54,10 +52,8 @@ public:
 	double _dis;
 	bool _isGo;
 	bool _isDone;
-	int _type;
 	double _typeTime;
-	_RunPoint(int nodeIndex,int type,std::vector<unsigned> pathV, creatMap *cmp){
-		_cmap = cmp;
+	_RunPoint(int nodeIndex,int type,std::vector<unsigned> pathV){
 		_pathVec = pathV;
 		_Index=nodeIndex;
 		_PreIndex=nodeIndex;
@@ -66,7 +62,6 @@ public:
 		_dis=0.0;
 		_isGo=false;
 		_isDone = false;
-		_type = type;
 		_typeTime=(2.5-(type/2))*1000;
 	}
 	bool initRP(){
@@ -79,16 +74,10 @@ public:
 		}
 		return false;
 	}
-
-	void rpGo(std::vector<unsigned> pathV) {
-		this->_pathVec = pathV;
-	}
-	int rpGoType();
 };
 
 class creatMap {
 private:
-	friend class _RunPoint;
 	unsigned startIndex;
 	unsigned endIndex;
 	const unsigned _mapX;
@@ -98,7 +87,7 @@ private:
 	const bool subSetRadomBalk(const std::vector<unsigned>&,const unsigned&);
 	const bool subSetRadomRalkNode(const std::vector<RNode>&, const RNode&);
 	const std::vector<RNode> setRadomBalk();
-	std::vector<unsigned> findPath(const unsigned, const unsigned, bool isReFind = false);
+	std::vector<std::vector<unsigned>> findPath(const unsigned, const unsigned);
 public:
 	creatMap(const unsigned,const unsigned,const unsigned);
 	int GoType(const unsigned, const int);

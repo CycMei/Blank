@@ -5,11 +5,13 @@
 #include<ctime>
 #include<iostream>
 #include<cstdlib>
-#include<exception>
+#include<stdexcept>
 #include<deque>
 #include<ctime>
 
 #include<cstdio>
+
+#include<Windows.h>
 
 
 
@@ -87,7 +89,7 @@ private:
 	const bool subSetRadomBalk(const std::vector<unsigned>&,const unsigned&);
 	const bool subSetRadomRalkNode(const std::vector<RNode>&, const RNode&);
 	const std::vector<RNode> setRadomBalk();
-	std::vector<unsigned> findPath(const unsigned, const unsigned);
+	std::vector<std::vector<unsigned>> findPath(const unsigned, const unsigned);
 public:
 	creatMap(const unsigned,const unsigned,const unsigned);
 	int GoType(const unsigned, const int);
